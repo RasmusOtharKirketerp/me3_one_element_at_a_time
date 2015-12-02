@@ -1,8 +1,10 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <class-diagram version="1.1.9" icons="true" always-add-relationships="false" generalizations="true" realizations="true" 
   associations="true" dependencies="false" nesting-relationships="true" router="FAN">  
-  <class id="1" language="java" name="me3_one_element_at_a_time.Screen" project="me3_one_element_at_a_time" 
-    file="/me3_one_element_at_a_time/src/me3_one_element_at_a_time/Screen.java" binary="false" corner="BOTTOM_RIGHT">    
+  <class id="1" language="java" name="me3_one_element_at_a_time.lokalKoordinatsystem" 
+    project="me3_one_element_at_a_time" 
+    file="/me3_one_element_at_a_time/src/me3_one_element_at_a_time/lokalKoordinatsystem.java" binary="false" 
+    corner="BOTTOM_RIGHT">    
     <position height="328" width="132" x="653" y="19"/>    
     <display autosize="false" stereotype="true" package="true" initial-value="false" signature="true" 
       sort-features="false" accessors="true" visibility="true">      

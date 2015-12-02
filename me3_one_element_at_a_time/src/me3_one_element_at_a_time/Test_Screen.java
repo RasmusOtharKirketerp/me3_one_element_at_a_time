@@ -10,8 +10,8 @@ import javax.swing.JPanel;
 
 public class Test_Screen extends JPanel {
 	private static final long serialVersionUID = 1L;
-	static Screen planetCenter = new Screen(400, 600);
-	static Screen planetCenter2 = new Screen(200, 300);
+	static LokalKoordinatsystem planetCenter = new LokalKoordinatsystem(400, 600);
+	static LokalKoordinatsystem planetCenter2 = new LokalKoordinatsystem(200, 300);
 
 	public Test_Screen() {
 		// TODO Auto-generated constructor stub
