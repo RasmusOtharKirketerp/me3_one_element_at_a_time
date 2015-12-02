@@ -7,7 +7,6 @@ import java.util.ArrayList;
 // En planet indeholde selv sit eget kredsøb
 public class Planet {
 	int radiusTilKredsloebCenter = 0;
-//	int diameterForPlanet = 0;
 	int radius = 0;
 	
 	// faktisk X,Y er det rigtigt x,y på skærmen
@@ -21,7 +20,7 @@ public class Planet {
 
 	String name;
 	public int omkreds;
-	public ArrayList<Planet> planeterIkredsloeb = new ArrayList<Planet>();
+//	public ArrayList<Planet> planeterIkredsloeb = new ArrayList<Planet>();
 	public long planetensTilbagelagteAfstand = 0;
 	public long planetensTilbagelagteAfstandFraStart = 0 ;
 	public long planetensHastinghed = 0;
@@ -52,8 +51,8 @@ public class Planet {
 		double radianer = (vinkel * Math.PI) / 180;
 		double enhedsCirkelX = Math.cos(radianer);
 
-		faktiskX = (int) (enhedsCirkelX * getRadiusPaaKredsloeb());
-		faktiskX += centerX;
+		faktiskX = (int) (enhedsCirkelX * getRadiusPaaKredsloeb()/ 2);
+		faktiskX += centerX ;
 		return faktiskX;
 	}
 
@@ -61,7 +60,7 @@ public class Planet {
 		double radianer = (vinkel * Math.PI) / 180;
 		double enhedsCirkelY = Math.sin(radianer);
 
-		faktiskY = (int) (enhedsCirkelY * getRadiusPaaKredsloeb());
+		faktiskY = (int) (enhedsCirkelY * getRadiusPaaKredsloeb()) / 2;
 		faktiskY += centerY;
 		return faktiskY;
 	}
@@ -71,10 +70,6 @@ public class Planet {
 				+ this.vinkelFraCenterTilPlanet);
 	}
 
-	public void tilfoejPlanetTilKredloeb(Planet planet) {
-		this.planeterIkredsloeb.add(planet);
-	}
-	
 	public double beregnAfstandTilbagelagtIalt(double click) {
 		// afstand tilbagelagt i kredsløbet i alt
 		double retVal = click * this.planetensHastinghed;
@@ -96,33 +91,37 @@ public class Planet {
 	// DRAW Funktion
 	// ---------------------------------------------------------------------------------------
 	public void drawPlanet(Graphics2D g, EclipseTime ec) {
-		System.out.println("drawplanet");
+		g.setColor(this.color);
 		beregnPlanetensGradIKredsløbet(ec.getSSClick());
-		LogPlanetXY();
-		draw(g, 0, 360, color, "PLANET", ec);
+		draw(g, 0, 360, "PLANET", ec);
 	}
 
 	public void drawOrbit(Graphics2D g) {
-		System.out.println("drawOrbit");
-		
+		g.setColor(this.color);
 		int realX = this.centerX - (radiusTilKredsloebCenter / 2);
         int realY = this.centerY - (radiusTilKredsloebCenter / 2);
+        // Selv kredløbs ringen
 		g.drawArc(realX , realY, radiusTilKredsloebCenter, radiusTilKredsloebCenter, 0, 360);
 		
-		g.fillArc(realX, realY, radiusTilKredsloebCenter, radiusTilKredsloebCenter, this.vinkelFraCenterTilPlanet, 3);
+		// Pilen ud til kredsløbsstregen
+		//g.fillArc(realX, realY, radiusTilKredsloebCenter, radiusTilKredsloebCenter, this.vinkelFraCenterTilPlanet*-1, 3);
 
+		// planeten PÅ kredsløbstregen
+		// x - cos til vinklen * faktiskX
+		// y - sin til vinklen * faktiskY
+		int cosX = (int) getPlanetX(vinkelFraCenterTilPlanet) - (radius / 2);
+		int sinY = (int) getPlanetY(vinkelFraCenterTilPlanet) - (radius / 2);
+		g.fillArc(cosX, sinY, radius, radius, 0, 360);
+		g.drawString(this.name, cosX+radius, sinY);
 	}
 	
-	public void draw(Graphics2D g, int startVinkel, int antalGrader, Color color, String type, EclipseTime ec) {      
+	public void draw(Graphics2D g, int startVinkel, int antalGrader, String type, EclipseTime ec) {      
 		// tegn selve planeten :
 		int realX = this.centerX - (radius / 2);
         int realY = this.centerY - (radius / 2);
 		
-		g.setColor(color);
 		if (type == "KREDSLØB")
 			g.drawArc(realX, realY, this.radius, this.radius, startVinkel, antalGrader);
-		if (type == "PLANET")
-			g.fillArc(realX, realY, radius, radius, startVinkel, antalGrader);
 
 		// tegn kredsløb hvis den har et...
 		if (this.radiusTilKredsloebCenter > 0)
