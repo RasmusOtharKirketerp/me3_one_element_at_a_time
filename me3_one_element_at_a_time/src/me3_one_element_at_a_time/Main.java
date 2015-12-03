@@ -12,15 +12,8 @@ import java.util.ArrayList;
 import javax.swing.JFrame;
 import javax.swing.JPanel;
 
-import org.omg.IOP.MultipleComponentProfileHelper;
-
 public class Main extends JPanel {
-	private static final int S_PLANET_SIZE = 5;
-	// private static final int M_PLANET_SIZE = 10;
-	private static final int L_PLANET_SIZE = 20;
-	private static final int XL_PLANET_SIZE = 50;
 	private static final long serialVersionUID = 1L;
-
 	static LokalKoordinatsystem aScreen = new LokalKoordinatsystem(GetScreenWorkingWidth(), GetScreenWorkingHeight());
 	static EclipseTime ec = new EclipseTime();
 
