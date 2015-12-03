@@ -14,7 +14,7 @@ import javax.swing.JPanel;
 
 import org.omg.IOP.MultipleComponentProfileHelper;
 
-public class Test_Planet extends JPanel {
+public class Main extends JPanel {
 	private static final int S_PLANET_SIZE = 5;
 	// private static final int M_PLANET_SIZE = 10;
 	private static final int L_PLANET_SIZE = 20;
@@ -34,7 +34,7 @@ public class Test_Planet extends JPanel {
 		return java.awt.GraphicsEnvironment.getLocalGraphicsEnvironment().getMaximumWindowBounds().height;
 	}
 
-	public Test_Planet() {
+	public Main() {
 	}
 
 	public void drawGrid(Graphics2D g2d) {
@@ -246,7 +246,7 @@ public class Test_Planet extends JPanel {
 		// TODO Auto-generated method stub
 		// theSun.tilfoejPlanetTilKredloeb(theEarth);
 		JFrame frame = new JFrame("MultiEclipse");
-		Test_Planet universe = new Test_Planet();
+		Main universe = new Main();
 		initUniverse();
 
 		frame.add(universe);
