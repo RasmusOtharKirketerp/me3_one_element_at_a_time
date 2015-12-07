@@ -1,9 +1,9 @@
 package me3_one_element_at_a_time;
 public class EclipseTime {
 	// default click = hour;
-	static private double ss_click;
-	static private double MAX_CLICK = 100;
-
+	private double ss_click;
+    private double unitsPrClick = 0.000001;
+    private double standardUnitPrClick = 0.000001;
 	public EclipseTime() {
 		ss_click = 0;
 	}
@@ -13,15 +13,20 @@ public class EclipseTime {
 	}
 
 	public void clickHour() {
-		ss_click += 1;
+		ss_click += unitsPrClick;
 	}
 
 	public double getSSClick() {
 		return ss_click;
 	}
 
-	public double getMAX_CLICK() {
-		return MAX_CLICK;
+	public void setUnitPrClick(double i)
+	{
+		this.unitsPrClick = i;
+	}
+	
+	public void setUnitPrClickToStandard(){
+		this.unitsPrClick = standardUnitPrClick;
 	}
 
 }
