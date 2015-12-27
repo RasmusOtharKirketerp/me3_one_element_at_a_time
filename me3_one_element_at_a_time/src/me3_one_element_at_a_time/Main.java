@@ -22,12 +22,8 @@ public class Main extends JPanel {
 	static final int MAX_PLANETS = 9;
 	static ArrayList<Planet> allePlaneterTilSolen = new ArrayList<Planet>();
 
+	static Planet sun = new Planet();
 
-	int[] xPoints = {0,0,0,0,0,0,0,0,0,0,0,0,0};
-	int[] yPoints = {0,0,0,0,0,0,0,0,0,0,0,0,0};
-	
-	
-	
 	public static int GetScreenWorkingWidth() {
 		return java.awt.GraphicsEnvironment.getLocalGraphicsEnvironment().getMaximumWindowBounds().width;
 	}
@@ -57,7 +53,8 @@ public class Main extends JPanel {
 		for (Planet planet : allePlaneterTilSolen) {
 			planet.drawPlanet(g2d, ec);
 		}
-		g.setColor(Color.BLUE);
+		ec.draw(g2d);
+		drawGrid(g2d);
 	}
 
 	public static int randInt(int min, int max) {
@@ -71,21 +68,28 @@ public class Main extends JPanel {
 		// jorden Uranus
 		// Venus mars Saturn Neptun
 		// Merkur Jupiter Pluto
+		// ORG int[] kredsloebAll = { 39, 72, 100, 152, 520, 954, 1918, 3006,
+		// 3900 };
 		int[] kredsloebAll = { 39, 72, 100, 152, 520, 954, 1918, 3006, 3900 };
-		int[] speedAll = { 47, 35, 29, 24, 13, 9, 6, 5, 4 };
 
+		// ORG int[] speedAll = { 47, 35, 29, 24, 13, 9, 6, 5, 4 };
+		int[] speedAll = { 47, 35, 100, 24, 13, 9, 6, 5, 4 };
+
+		// org. sizes { 4878, 12104, 12756, 6787, 142800, 120000, 51118, 49528,
+		// 970 };
 		int[] sizeAll = { 4878, 12104, 12756, 6787, 142800, 120000, 51118, 49528, 970 };
 
 		for (int i = 0; i < sizeAll.length; i++)
 			sizeAll[i] = sizeAll[i] / 1000;
 
+		ec.reset();
 		allePlaneterTilSolen.clear();
 		// Alloker plads i array of fyld data fra standard arrays ud...
 
 		for (int nyPlanetCounter = 0; nyPlanetCounter < MAX_PLANETS; nyPlanetCounter++) {
 			Planet nyPlanet = new Planet();
 			allePlaneterTilSolen.add(nyPlanet);
-			allePlaneterTilSolen.get(nyPlanetCounter).setPlanetIndex(nyPlanetCounter+1);
+			allePlaneterTilSolen.get(nyPlanetCounter).setPlanetIndex(nyPlanetCounter);
 			allePlaneterTilSolen.get(nyPlanetCounter).centerX = aScreen.relX(0);
 			allePlaneterTilSolen.get(nyPlanetCounter).centerY = aScreen.relY(0);
 			allePlaneterTilSolen.get(nyPlanetCounter).planetensHastinghed = speedAll[nyPlanetCounter];
@@ -94,7 +98,10 @@ public class Main extends JPanel {
 			allePlaneterTilSolen.get(nyPlanetCounter).planetensTilbagelagteAfstand = 1;
 			allePlaneterTilSolen.get(nyPlanetCounter).planetensTilbagelagteAfstandFraStart = randInt(0,
 					(int) allePlaneterTilSolen.get(nyPlanetCounter).getOmkredsPaaKredsloebet());
+			// start alle planet i o afstand
+			allePlaneterTilSolen.get(nyPlanetCounter).planetensTilbagelagteAfstandFraStart = 0;
 			allePlaneterTilSolen.get(nyPlanetCounter).setDrawRayToPlanet(false);
+
 		}
 
 		// http://www.windows2universe.org/our_solar_system/planets_table.html
@@ -111,58 +118,37 @@ public class Main extends JPanel {
 		planetNr = 2;
 		allePlaneterTilSolen.get(planetNr).name = "Jorden";
 		allePlaneterTilSolen.get(planetNr).color = Color.GREEN;
-		moonGenerator(allePlaneterTilSolen.get(planetNr), 1);
+		allePlaneterTilSolen.get(planetNr).moonGenerator(1);
 
 		planetNr = 3;
 		allePlaneterTilSolen.get(planetNr).name = "Mars";
 		allePlaneterTilSolen.get(planetNr).color = Color.RED;
-		moonGenerator(allePlaneterTilSolen.get(planetNr), 2);
-		moonGenerator(allePlaneterTilSolen.get(planetNr).moons.get(0), 2);
+		allePlaneterTilSolen.get(planetNr).moonGenerator(2);
 
 		planetNr = 4;
 		allePlaneterTilSolen.get(planetNr).name = "Jupiter";
 		allePlaneterTilSolen.get(planetNr).color = Color.CYAN;
-		moonGenerator(allePlaneterTilSolen.get(planetNr), 67);
+		allePlaneterTilSolen.get(planetNr).moonGenerator(67);
 
 		planetNr = 5;
 		allePlaneterTilSolen.get(planetNr).name = "Saturn";
 		allePlaneterTilSolen.get(planetNr).color = Color.YELLOW;
-		moonGenerator(allePlaneterTilSolen.get(planetNr), 53);
+		allePlaneterTilSolen.get(planetNr).moonGenerator(53);
 
 		planetNr = 6;
 		allePlaneterTilSolen.get(planetNr).name = "Uranus";
 		allePlaneterTilSolen.get(planetNr).color = Color.LIGHT_GRAY;
-		moonGenerator(allePlaneterTilSolen.get(planetNr), 27);
+		allePlaneterTilSolen.get(planetNr).moonGenerator(27);
 
 		planetNr = 7;
 		allePlaneterTilSolen.get(planetNr).name = "Neptun";
 		allePlaneterTilSolen.get(planetNr).color = Color.WHITE;
-		moonGenerator(allePlaneterTilSolen.get(planetNr), 13);
+		allePlaneterTilSolen.get(planetNr).moonGenerator(13);
 
 		planetNr = 8;
 		allePlaneterTilSolen.get(planetNr).name = "Pluto (dwarf)";
 		allePlaneterTilSolen.get(planetNr).color = Color.gray;
 
-	}
-
-	static public void moonGenerator(Planet x, int GenMoon) {
-		for (int i = 0; i < GenMoon; i++) {
-			Planet moon = new Planet();
-			moon.name = "Moon" + i;
-			moon.centerX = x.centerX;
-			moon.centerY = x.centerY;
-			moon.planetensHastinghed = randInt(0, (int) x.planetensHastinghed * 5);
-			moon.planetensTilbagelagteAfstand = 0;
-			moon.planetensTilbagelagteAfstandFraStart = randInt(0, (int) x.getOmkredsPaaKredsloebet());
-			moon.setRadiusPaaKredsloeb(x.getRadius() + x.getRadius() / 10 + randInt(1, x.getRadius() / 3));
-			moon.setRadius(5);
-			moon.color = (new Color(randInt(200, 255), randInt(30, 100), randInt(30, 90)));
-			moon.setDrawRayToPlanet(false);
-			moon.setDrawName(false);
-			moon.setDrawOrbit(false);
-			x.addMoon(moon);
-
-		}
 	}
 
 	static public KeyListener myKL = new KeyListener() {
@@ -206,6 +192,22 @@ public class Main extends JPanel {
 			}
 			if (e.getKeyChar() == '-') {
 				speed(0.5);
+			}
+			if (e.getKeyChar() == 'm') {
+				for (Planet x : allePlaneterTilSolen) {
+					x.setDrawMoons(false);
+					for (Planet moon : x.moons) {
+						moon.setDrawMoons(false);
+					}
+				}
+			}
+			if (e.getKeyChar() == 'M') {
+				for (Planet x : allePlaneterTilSolen) {
+					x.setDrawMoons(true);
+					for (Planet moon : x.moons) {
+						moon.setDrawMoons(true);
+					}
+				}
 			}
 			if (e.getKeyChar() == 'p') {
 				if (!pause) {
@@ -313,12 +315,12 @@ public class Main extends JPanel {
 		frame.add(universe);
 		frame.addMouseListener(ma);
 		frame.addKeyListener(myKL);
-		frame.setSize(aScreen.maxX, aScreen.maxY);
+		frame.setSize(aScreen.maxX - 200, aScreen.maxY - 200);
 		frame.setVisible(true);
 		frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
 		while (true) {
 			universe.repaint();
-			// Thread.sleep(5);
+			Thread.sleep(5);
 			ec.click();
 		}
 

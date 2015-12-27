@@ -3,6 +3,7 @@ package me3_one_element_at_a_time;
 import java.awt.Color;
 import java.awt.Graphics2D;
 import java.util.ArrayList;
+import java.util.Random;
 
 // En planet indeholde selv sit eget kredsøb
 public class Planet {
@@ -12,12 +13,12 @@ public class Planet {
 	private int radius = 0;
 
 	// faktisk X,Y er det rigtigt x,y på skærmen
-	int faktiskX = 0;
-	int faktiskY = 0;
+	long faktiskX = 0;
+	long faktiskY = 0;
 	// center X,Y er relativt
-	int centerX = 0;
-	int centerY = 0;
-	int vinkelFraCenterTilPlanet = 0;
+	long centerX = 0;
+	long centerY = 0;
+	float vinkelFraCenterTilPlanet = 0;
 
 	String name;
 	private double omkreds;
@@ -29,6 +30,21 @@ public class Planet {
 	public boolean drawRayToPlanet = true;
 	public boolean drawName = true;
 	public boolean drawOrbit = true;
+	public boolean drawMoons = true;
+
+	public boolean isDrawMoons() {
+		return drawMoons;
+	}
+
+	public void setDrawMoons(boolean drawMoons) {
+		this.drawMoons = drawMoons;
+	}
+
+	public static int randInt(int min, int max) {
+		Random rand = new Random();
+		int randomNum = rand.nextInt((max - min) + 1) + min;
+		return randomNum;
+	}
 
 	// GETTER AND SETTERS *************************************
 	public int getRadius() {
@@ -100,16 +116,15 @@ public class Planet {
 		this.omkreds = (int) Math.PI * this.radiusTilKredsloebCenter * 2;
 	}
 
-	public double getPlanetX(int vinkel) {
+	public double getPlanetX(float vinkel) {
 		double radianer = (vinkel * Math.PI) / 180;
 		double enhedsCirkelX = Math.cos(radianer);
-
-		faktiskX = (int) (enhedsCirkelX * getRadiusPaaKredsloeb() / 2);
+		faktiskX = Math.round(enhedsCirkelX * getRadiusPaaKredsloeb() / 2);
 		faktiskX += centerX;
 		return faktiskX;
 	}
 
-	public double getPlanetY(int vinkel) {
+	public double getPlanetY(float vinkel) {
 		double radianer = (vinkel * Math.PI) / 180;
 		double enhedsCirkelY = Math.sin(radianer);
 
@@ -132,10 +147,10 @@ public class Planet {
 	public void beregnPlanetensGradIKredsløbet(double d) {
 		// Denne funktin skal retunere den grad planetet er i kredsløbet
 		// ud fra den vinkel en linje skulle tegnes fra centrum og ud
-		int retVal = 0;
+		float retVal = 0;
 		double afstand = this.planetensTilbagelagteAfstandFraStart
 				+ this.beregnAfstandTilbagelagtIalt(d) % this.omkreds;
-		retVal = (int) ((afstand / this.omkreds) * 360);
+		retVal = (float) ((afstand / this.omkreds) * 360);
 
 		this.vinkelFraCenterTilPlanet = retVal;
 	}
@@ -156,48 +171,61 @@ public class Planet {
 		if (isDrawOrbit())
 			g.drawArc(realX, realY, (int) radiusTilKredsloebCenter, (int) radiusTilKredsloebCenter, 0, 360);
 
-		// Pilen ud til kredsløbsstregen
-		if (isDrawRayToPlanet()) {
-			g.fillArc(realX, realY, (int) radiusTilKredsloebCenter, (int) radiusTilKredsloebCenter,
-					this.vinkelFraCenterTilPlanet * -1, 1);
-		}
-		// planeten PÅ kredsløbstregen
+		// Tegn selve planeten PÅ kredsløbstregen
 		// x - cos til vinklen * faktiskX
 		// y - sin til vinklen * faktiskY
 		int cosX = (int) getPlanetX(vinkelFraCenterTilPlanet) - (radius / 2);
 		int sinY = (int) getPlanetY(vinkelFraCenterTilPlanet) - (radius / 2);
 		g.fillArc(cosX, sinY, radius, radius, 0, 360);
 		if (isDrawName()) {
-			g.drawString(this.name + " (" + vinkelFraCenterTilPlanet + ")", cosX + radius, sinY + radius);
+			g.drawString(this.name, cosX + radius, sinY + radius);
 		}
+		// Pilen ud til kredsløbsstregen
+		if (isDrawRayToPlanet()) {
+			// g.fillArc(realX, realY, (int) radiusTilKredsloebCenter, (int)
+			// radiusTilKredsloebCenter,
+			// this.vinkelFraCenterTilPlanet * -1, 1);
+			g.drawLine((int) this.centerX, (int) this.centerY, cosX + radius / 2, sinY + radius / 2);
+		}
+
 	}
 
 	public void draw(Graphics2D g, int startVinkel, int antalGrader, String type, EclipseTime ec) {
-		// tegn selve planeten :
-		int realX = this.centerX - (radius / 2);
-		int realY = this.centerY - (radius / 2);
-
-		if (type == "KREDSLØB")
-			g.drawArc(realX, realY, this.radius, this.radius, startVinkel, antalGrader);
-
 		// tegn kredsløb hvis den har et...
-		if (this.radiusTilKredsloebCenter > 0)
-			drawOrbit(g);
-		else
-			System.out.println("Intet kredsløb for : " + this.name);
-
+		drawOrbit(g);
+		// tegn måner til planeten..
 		drawMoons(g, ec);
 	}
 
 	public void drawMoons(Graphics2D g, EclipseTime ec) {
-		// TODO Auto-generated method stub
-
-		for (Planet moons : moons) {
-			moons.centerX = this.faktiskX;
-			moons.centerY = this.faktiskY;
-			moons.drawPlanet(g, ec);
+		if (this.isDrawMoons()) {
+			for (Planet moons : moons) {
+				moons.centerX = this.faktiskX;
+				moons.centerY = this.faktiskY;
+				moons.drawPlanet(g, ec);
+			}
 		}
 
+	}
+
+	public void moonGenerator(int GenMoon) {
+		for (int i = 0; i < GenMoon; i++) {
+			Planet moon = new Planet();
+			moon.name = "Moon" + i;
+			moon.centerX = this.centerX;
+			moon.centerY = this.centerY;
+			moon.planetensHastinghed = randInt(0, (int) this.planetensHastinghed * 5);
+			moon.planetensTilbagelagteAfstand = 0;
+			moon.planetensTilbagelagteAfstandFraStart = randInt(0, (int) this.getOmkredsPaaKredsloebet());
+			moon.setRadiusPaaKredsloeb(this.getRadius() + this.getRadius() / 10 + randInt(1, this.getRadius() / 3));
+			moon.setRadius(5);
+			moon.color = (new Color(randInt(200, 255), randInt(30, 100), randInt(30, 90)));
+			moon.setDrawRayToPlanet(false);
+			moon.setDrawName(false);
+			moon.setDrawOrbit(false);
+			this.addMoon(moon);
+
+		}
 	}
 
 }
