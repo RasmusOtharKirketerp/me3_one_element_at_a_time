@@ -20,6 +20,7 @@ public class Main extends JPanel {
 	static LokalKoordinatsystem aScreen = new LokalKoordinatsystem(GetScreenWorkingWidth(), GetScreenWorkingHeight());
 	static EclipseTime ec = new EclipseTime();
 	static final int MAX_PLANETS = 9;
+	static int analyse = 1;
 	static ArrayList<Planet> allePlaneterTilSolen = new ArrayList<Planet>();
 
 	static Planet sun = new Planet();
@@ -52,8 +53,25 @@ public class Main extends JPanel {
 		this.setBackground(Color.black);
 		for (Planet planet : allePlaneterTilSolen) {
 			planet.drawPlanet(g2d, ec);
+			if (planet.getPlanetIndex() > 0) {
+				for (Planet drawToplanet : allePlaneterTilSolen) {
+					if (analyse == 1) {
+						if (planet.getPlanetIndex() > drawToplanet.getPlanetIndex() +1)
+							g.drawLine((int) planet.faktiskX, (int) planet.faktiskY, (int) drawToplanet.faktiskX,
+									(int) drawToplanet.faktiskY);
+					}
+					if (analyse == 2)
+					{
+						if (planet.getPlanetIndex() == drawToplanet.getPlanetIndex() + 1)
+							g.drawLine((int) planet.faktiskX, (int) planet.faktiskY, (int) drawToplanet.faktiskX,
+									(int) drawToplanet.faktiskY);
+						
+					}
+				}
+			}
+
 		}
-		ec.draw(g2d);
+		ec.draw(g2d, allePlaneterTilSolen);
 		drawGrid(g2d);
 	}
 
@@ -70,14 +88,14 @@ public class Main extends JPanel {
 		// Merkur Jupiter Pluto
 		// ORG int[] kredsloebAll = { 39, 72, 100, 152, 520, 954, 1918, 3006,
 		// 3900 };
-		int[] kredsloebAll = { 39, 72, 100, 152, 520, 954, 1918, 3006, 3900 };
+		int[] kredsloebAll = { 50, 100, 150, 200, 250, 300, 400, 500, 600 };
 
 		// ORG int[] speedAll = { 47, 35, 29, 24, 13, 9, 6, 5, 4 };
-		int[] speedAll = { 47, 35, 100, 24, 13, 9, 6, 5, 4 };
+		int[] speedAll = { 10, 10, 10, 10, 10, 10, 10, 10, 10 };
 
 		// org. sizes { 4878, 12104, 12756, 6787, 142800, 120000, 51118, 49528,
 		// 970 };
-		int[] sizeAll = { 4878, 12104, 12756, 6787, 142800, 120000, 51118, 49528, 970 };
+		int[] sizeAll = { 40, 40, 40, 40, 40, 40, 40, 40, 40 };
 
 		for (int i = 0; i < sizeAll.length; i++)
 			sizeAll[i] = sizeAll[i] / 1000;
@@ -218,6 +236,12 @@ public class Main extends JPanel {
 					pause = false;
 				}
 			}
+			if (e.getKeyChar() == 'a') {
+				analyse += 1;
+				if (analyse > 2)
+					analyse = 0;
+			}
+
 		}
 
 		@Override

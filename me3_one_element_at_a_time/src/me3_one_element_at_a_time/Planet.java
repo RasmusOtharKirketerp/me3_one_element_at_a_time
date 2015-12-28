@@ -177,6 +177,8 @@ public class Planet {
 		int cosX = (int) getPlanetX(vinkelFraCenterTilPlanet) - (radius / 2);
 		int sinY = (int) getPlanetY(vinkelFraCenterTilPlanet) - (radius / 2);
 		g.fillArc(cosX, sinY, radius, radius, 0, 360);
+		
+		
 		if (isDrawName()) {
 			g.drawString(this.name, cosX + radius, sinY + radius);
 		}

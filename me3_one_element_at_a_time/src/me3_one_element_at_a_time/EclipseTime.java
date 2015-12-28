@@ -2,6 +2,7 @@ package me3_one_element_at_a_time;
 
 import java.awt.Color;
 import java.awt.Graphics2D;
+import java.util.ArrayList;
 
 public class EclipseTime {
 	// default click = hour;
@@ -43,7 +44,7 @@ public class EclipseTime {
 		ss_click = 0;
 	}
 	
-	public void draw(Graphics2D g){
+	public void draw(Graphics2D g, ArrayList<Planet> arr) {
 		g.setColor(Color.white);
 		g.drawString("EclipseTime :", indryk, linje);
 		g.drawString("Clicks : " + ss_click, indryk, linje * 2);
@@ -56,8 +57,14 @@ public class EclipseTime {
 		g.drawString("ArrowKeys = move", indryk, linje * 9);
 		g.drawString("Mouse click Left/Right = zoom in/out", indryk, linje * 10);
 		g.drawString("Key (m/M) = Moons on/off", indryk, linje * 11);
+		g.drawString("Key (a)   = Analyse mode (0,1,2) ", indryk, linje * 12);
 		
-
+		for (int i = 0; i < arr.size(); i++) {
+			Planet x = arr.get(i);
+			g.drawString(x.name + " vinkel : "+ x.vinkelFraCenterTilPlanet, indryk, linje * (i+13));
+			
+		}
+        
 	}
 
 }
