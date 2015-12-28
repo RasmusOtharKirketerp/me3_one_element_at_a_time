@@ -30,7 +30,7 @@ public class Planet {
 	public boolean drawRayToPlanet = true;
 	public boolean drawName = true;
 	public boolean drawOrbit = true;
-	public boolean drawMoons = true;
+	public boolean drawMoons = false;
 
 	public boolean isDrawMoons() {
 		return drawMoons;

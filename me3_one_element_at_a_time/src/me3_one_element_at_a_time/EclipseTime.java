@@ -58,11 +58,11 @@ public class EclipseTime {
 		g.drawString("Mouse click Left/Right = zoom in/out", indryk, linje * 10);
 		g.drawString("Key (m/M) = Moons on/off", indryk, linje * 11);
 		g.drawString("Key (a)   = Analyse mode (0,1,2) ", indryk, linje * 12);
+		g.drawString("Key (d/D) = debug ", indryk, linje * 13);
 		
 		for (int i = 0; i < arr.size(); i++) {
 			Planet x = arr.get(i);
-			g.drawString(x.name + " vinkel : "+ x.vinkelFraCenterTilPlanet, indryk, linje * (i+13));
-			
+			g.drawString(x.name + " vinkel : "+ x.vinkelFraCenterTilPlanet, indryk, linje * (i+14));		
 		}
         
 	}
