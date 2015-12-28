@@ -3,8 +3,7 @@ public class EclipseTime {
 	// default click = hour;
 	static private double ss_click;
 	static private double MAX_CLICK = 100;
-    private double unitsPrClick = 0.01;
-    private double standardUnitPrClick = 0.01;
+
 	public EclipseTime() {
 		ss_click = 0;
 	}
@@ -14,7 +13,7 @@ public class EclipseTime {
 	}
 
 	public void clickHour() {
-		ss_click += unitsPrClick;
+		ss_click += 1;
 	}
 
 	public double getSSClick() {
@@ -23,15 +22,6 @@ public class EclipseTime {
 
 	public double getMAX_CLICK() {
 		return MAX_CLICK;
-	}
-	
-	public void setUnitPrClick(double i)
-	{
-		this.unitsPrClick = i;
-	}
-	
-	public void setUnitPrClickToStandard(){
-		this.unitsPrClick = standardUnitPrClick;
 	}
 
 }
