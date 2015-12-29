@@ -9,8 +9,6 @@ import java.awt.event.KeyEvent;
 import java.awt.event.KeyListener;
 import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
-import java.util.ArrayList;
-import java.util.Random;
 
 import javax.swing.JFrame;
 import javax.swing.JPanel;
@@ -19,11 +17,11 @@ public class Main extends JPanel {
 	private static final long serialVersionUID = 1L;
 	static LokalKoordinatsystem aScreen = new LokalKoordinatsystem(GetScreenWorkingWidth(), GetScreenWorkingHeight());
 	static EclipseTime ec = new EclipseTime();
-	static final int MAX_PLANETS = 9;
 	static int analyse = 1;
 	static boolean use_real_values = true;
-	static ArrayList<Planet> allePlaneterTilSolen = new ArrayList<Planet>();
-
+	
+	static UniverseData ud = new UniverseData(false);
+	
 	public static int GetScreenWorkingWidth() {
 		return java.awt.GraphicsEnvironment.getLocalGraphicsEnvironment().getMaximumWindowBounds().width;
 	}
@@ -50,10 +48,12 @@ public class Main extends JPanel {
 		Graphics2D g2d = (Graphics2D) g;
 		g2d.setRenderingHint(RenderingHints.KEY_ANTIALIASING, RenderingHints.VALUE_ANTIALIAS_ON);
 		this.setBackground(Color.black);
-		for (Planet planet : allePlaneterTilSolen) {
+		for (Planet planet : ud.allPlanetsToSun) {
+	        g.setColor(planet.color);
+	        planet.calcPlanet(ec);
 			planet.drawPlanet(g2d, ec);
 			if (planet.getPlanetIndex() > 0) {
-				for (Planet drawToplanet : allePlaneterTilSolen) {
+				for (Planet drawToplanet : ud.allPlanetsToSun) {
 					if (analyse == 1) {
 						if (planet.getPlanetIndex() > drawToplanet.getPlanetIndex() + 1)
 							g.drawLine((int) planet.faktiskX, (int) planet.faktiskY, (int) drawToplanet.faktiskX,
@@ -69,110 +69,20 @@ public class Main extends JPanel {
 			}
 
 		}
-		ec.draw(g2d, allePlaneterTilSolen);
+		ec.draw(g2d, ud.allPlanetsToSun);
 	}
 
-	public static int randInt(int min, int max) {
-		Random rand = new Random();
-		int randomNum = rand.nextInt((max - min) + 1) + min;
-		return randomNum;
-	}
+
 
 	static public void initUniverse() {
-
-		// tabel indeholder planetes afstand fra solen (AU) = radius fra solen
-
-		int[] kredsloebAll_real = { 39, 72, 100, 152, 520, 954, 1918, 3006, 3900 };
-		int[] kredsloebAll_debug = { 50, 100, 150, 200, 250, 300, 400, 500, 600 };
-
-		int[] speedAll_real = { 47, 35, 29, 24, 13, 9, 6, 5, 4 };
-		int[] speedAll_debug = { 10, 10, 10, 10, 10, 10, 10, 10, 10 };
-
-		int[] sizeAll_real = { 4878, 12104, 12756, 6787, 142800, 120000, 51118, 49528, 970 };
-		int[] sizeAll_debug = { 40, 40, 40, 40, 40, 40, 40, 40, 40 };
-
-		int[] kredsloebAll, sizeAll, speedAll;
-
-		if (use_real_values) {
-			kredsloebAll = kredsloebAll_real;
-			sizeAll = sizeAll_real;
-			speedAll = speedAll_real;
-		} else {
-			kredsloebAll = kredsloebAll_debug;
-			sizeAll = sizeAll_debug;
-			speedAll = speedAll_debug;
-
+//		ud.allPlanetsToSun.clear();
+		
+		for (int nyPlanetCounter = 0; nyPlanetCounter < UniverseData.MAX_PLANETS; nyPlanetCounter++) {
+			ud.allPlanetsToSun.get(nyPlanetCounter).centerX = aScreen.relX(0);
+			ud.allPlanetsToSun.get(nyPlanetCounter).centerY = aScreen.relY(0);
 		}
-
-		for (int i = 0; i < sizeAll.length; i++)
-			sizeAll[i] = sizeAll[i] / 1000;
-
 		ec.reset();
-		allePlaneterTilSolen.clear();
 		// Alloker plads i array of fyld data fra standard arrays ud...
-
-		for (int nyPlanetCounter = 0; nyPlanetCounter < MAX_PLANETS; nyPlanetCounter++) {
-			Planet nyPlanet = new Planet();
-			allePlaneterTilSolen.add(nyPlanet);
-			allePlaneterTilSolen.get(nyPlanetCounter).setPlanetIndex(nyPlanetCounter);
-			allePlaneterTilSolen.get(nyPlanetCounter).centerX = aScreen.relX(0);
-			allePlaneterTilSolen.get(nyPlanetCounter).centerY = aScreen.relY(0);
-			allePlaneterTilSolen.get(nyPlanetCounter).planetensHastinghed = speedAll[nyPlanetCounter];
-			allePlaneterTilSolen.get(nyPlanetCounter).setRadiusPaaKredsloeb(kredsloebAll[nyPlanetCounter]);
-			allePlaneterTilSolen.get(nyPlanetCounter).setRadius(sizeAll[nyPlanetCounter]);
-			allePlaneterTilSolen.get(nyPlanetCounter).planetensTilbagelagteAfstand = 1;
-			allePlaneterTilSolen.get(nyPlanetCounter).planetensTilbagelagteAfstandFraStart = randInt(0,
-					(int) allePlaneterTilSolen.get(nyPlanetCounter).getOmkredsPaaKredsloebet());
-			// start alle planet i o afstand
-			allePlaneterTilSolen.get(nyPlanetCounter).planetensTilbagelagteAfstandFraStart = 0;
-			allePlaneterTilSolen.get(nyPlanetCounter).setDrawRayToPlanet(false);
-
-		}
-
-		// http://www.windows2universe.org/our_solar_system/planets_table.html
-		// http://www.fourmilab.ch/cgi-bin/Solar
-
-		int planetNr = 0;
-		allePlaneterTilSolen.get(planetNr).name = "Merkur";
-		allePlaneterTilSolen.get(planetNr).color = Color.MAGENTA;
-
-		planetNr = 1;
-		allePlaneterTilSolen.get(planetNr).name = "Venus";
-		allePlaneterTilSolen.get(planetNr).color = Color.CYAN;
-
-		planetNr = 2;
-		allePlaneterTilSolen.get(planetNr).name = "Jorden";
-		allePlaneterTilSolen.get(planetNr).color = Color.GREEN;
-		allePlaneterTilSolen.get(planetNr).moonGenerator(1);
-
-		planetNr = 3;
-		allePlaneterTilSolen.get(planetNr).name = "Mars";
-		allePlaneterTilSolen.get(planetNr).color = Color.RED;
-		allePlaneterTilSolen.get(planetNr).moonGenerator(2);
-
-		planetNr = 4;
-		allePlaneterTilSolen.get(planetNr).name = "Jupiter";
-		allePlaneterTilSolen.get(planetNr).color = Color.CYAN;
-		allePlaneterTilSolen.get(planetNr).moonGenerator(67);
-
-		planetNr = 5;
-		allePlaneterTilSolen.get(planetNr).name = "Saturn";
-		allePlaneterTilSolen.get(planetNr).color = Color.YELLOW;
-		allePlaneterTilSolen.get(planetNr).moonGenerator(53);
-
-		planetNr = 6;
-		allePlaneterTilSolen.get(planetNr).name = "Uranus";
-		allePlaneterTilSolen.get(planetNr).color = Color.LIGHT_GRAY;
-		allePlaneterTilSolen.get(planetNr).moonGenerator(27);
-
-		planetNr = 7;
-		allePlaneterTilSolen.get(planetNr).name = "Neptun";
-		allePlaneterTilSolen.get(planetNr).color = Color.WHITE;
-		allePlaneterTilSolen.get(planetNr).moonGenerator(13);
-
-		planetNr = 8;
-		allePlaneterTilSolen.get(planetNr).name = "Pluto (dwarf)";
-		allePlaneterTilSolen.get(planetNr).color = Color.gray;
 
 	}
 
@@ -192,7 +102,7 @@ public class Main extends JPanel {
 			System.out.println("Code : " + e.getKeyCode());
 			System.out.println("Char : " + e.getKeyChar());
 			if (e.getKeyChar() == 'r') {
-				for (Planet x : allePlaneterTilSolen) {
+				for (Planet x : ud.allPlanetsToSun) {
 					x.setDrawRayToPlanet(true);
 					for (Planet moon : x.moons) {
 						moon.setDrawRayToPlanet(true);
@@ -201,7 +111,7 @@ public class Main extends JPanel {
 				;
 			}
 			if (e.getKeyChar() == 'R') {
-				for (Planet x : allePlaneterTilSolen) {
+				for (Planet x : ud.allPlanetsToSun) {
 					x.setDrawRayToPlanet(false);
 					for (Planet moon : x.moons) {
 						moon.setDrawRayToPlanet(false);
@@ -219,7 +129,7 @@ public class Main extends JPanel {
 				speed(0.5);
 			}
 			if (e.getKeyChar() == 'm') {
-				for (Planet x : allePlaneterTilSolen) {
+				for (Planet x : ud.allPlanetsToSun) {
 					x.setDrawMoons(false);
 					for (Planet moon : x.moons) {
 						moon.setDrawMoons(false);
@@ -227,7 +137,7 @@ public class Main extends JPanel {
 				}
 			}
 			if (e.getKeyChar() == 'M') {
-				for (Planet x : allePlaneterTilSolen) {
+				for (Planet x : ud.allPlanetsToSun) {
 					x.setDrawMoons(true);
 					for (Planet moon : x.moons) {
 						moon.setDrawMoons(true);
@@ -288,7 +198,7 @@ public class Main extends JPanel {
 
 		private void shiftLeftRight(int i) {
 			// TODO Auto-generated method stub
-			for (Planet x : allePlaneterTilSolen) {
+			for (Planet x : ud.allPlanetsToSun) {
 				x.centerX += i;
 			}
 
@@ -296,7 +206,7 @@ public class Main extends JPanel {
 
 		private void shiftUpDown(int i) {
 			// TODO Auto-generated method stub
-			for (Planet x : allePlaneterTilSolen) {
+			for (Planet x : ud.allPlanetsToSun) {
 				x.centerY += i;
 			}
 
@@ -315,7 +225,7 @@ public class Main extends JPanel {
 	};
 
 	public static void zoom(double d) {
-		for (Planet x : allePlaneterTilSolen) {
+		for (Planet x : ud.allPlanetsToSun) {
 			x.setRadiusPaaKredsloeb(x.getRadiusPaaKredsloeb() * d);
 			x.setRadius((int) (x.getRadius() * d));
 			x.planetensHastinghed = x.planetensHastinghed * d;
@@ -329,7 +239,7 @@ public class Main extends JPanel {
 	}
 
 	public static void speed(double d) {
-		for (Planet x : allePlaneterTilSolen) {
+		for (Planet x : ud.allPlanetsToSun) {
 			x.planetensHastinghed *= d;
 			if (x.planetensHastinghed <= 0)
 				x.planetensHastinghed = 1;
