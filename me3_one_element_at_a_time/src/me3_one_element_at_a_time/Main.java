@@ -17,7 +17,7 @@ public class Main extends JPanel {
 	private static final long serialVersionUID = 1L;
 	static LokalKoordinatsystem aScreen = new LokalKoordinatsystem(GetScreenWorkingWidth(), GetScreenWorkingHeight());
 	static EclipseTime ec = new EclipseTime();
-	static int analyse = 1;
+	static int analyse = 2;
 	static boolean use_real_values = true;
 	
 	static UniverseData ud = new UniverseData(false);
@@ -228,11 +228,11 @@ public class Main extends JPanel {
 		for (Planet x : ud.allPlanetsToSun) {
 			x.setRadiusPaaKredsloeb(x.getRadiusPaaKredsloeb() * d);
 			x.setRadius((int) (x.getRadius() * d));
-			x.planetensHastinghed = x.planetensHastinghed * d;
+			x.planetensHastighed = x.planetensHastighed * d;
 			for (Planet m : x.moons) {
 				m.setRadiusPaaKredsloeb(m.getRadiusPaaKredsloeb() * d);
 				m.setRadius((int) (m.getRadius() * d));
-				m.planetensHastinghed = m.planetensHastinghed * d;
+				m.planetensHastighed = m.planetensHastighed * d;
 			}
 
 		}
@@ -240,13 +240,13 @@ public class Main extends JPanel {
 
 	public static void speed(double d) {
 		for (Planet x : ud.allPlanetsToSun) {
-			x.planetensHastinghed *= d;
-			if (x.planetensHastinghed <= 0)
-				x.planetensHastinghed = 1;
+			x.planetensHastighed *= d;
+			if (x.planetensHastighed <= 0)
+				x.planetensHastighed = 1;
 			for (Planet m : x.moons) {
-				m.planetensHastinghed = m.planetensHastinghed * d;
-				if (m.planetensHastinghed <= 0)
-					m.planetensHastinghed = 1;
+				m.planetensHastighed = m.planetensHastighed * d;
+				if (m.planetensHastighed <= 0)
+					m.planetensHastighed = 1;
 
 			}
 

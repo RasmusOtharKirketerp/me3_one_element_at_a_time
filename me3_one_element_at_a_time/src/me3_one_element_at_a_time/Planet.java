@@ -13,7 +13,7 @@ public class Planet {
 	double radiusTilKredsloebCenter = 0;
 	// planetIndex = plads/nummer fra centrum eks = Jorden = 3;
 	private int planetIndex = 0;
-	private int radius = 0;
+	private double radius = 0;
 
 	// orbit real x,y
 	int orbitRealX, orbitRealY = 0;
@@ -24,6 +24,9 @@ public class Planet {
 	// center X,Y er relativt
 	long centerX = 0;
 	long centerY = 0;
+	
+	//enheds Cirkel x,y
+	double eX, eY = 0;
 	float vinkelFraCenterTilPlanet = 0;
 
 	String name;
@@ -31,7 +34,7 @@ public class Planet {
 	public ArrayList<Planet> moons = new ArrayList<Planet>();
 	public long planetensTilbagelagteAfstand = 0;
 	public long planetensTilbagelagteAfstandFraStart = 0;
-	public double planetensHastinghed = 0;
+	public double planetensHastighed = 0;
 	public Color color;
 	public boolean drawRayToPlanet = true;
 	public boolean drawName = true;
@@ -47,13 +50,13 @@ public class Planet {
 	}
 
 	// GETTER AND SETTERS *************************************
-	public int getRadius() {
+	public double getRadius() {
 		return radius;
 	}
 
-	public void setRadius(int radius) {
-		if (radius > 4)
-			this.radius = radius;
+	public void setRadius(double planetsize) {
+		if (planetsize > 4)
+			this.radius = planetsize;
 		else
 			this.radius = 5;
 	}
@@ -115,24 +118,26 @@ public class Planet {
 		this.radiusTilKredsloebCenter = d;
 		this.omkreds = (int) Math.PI * this.radiusTilKredsloebCenter * 2;
 	}
-
-	public void getPlanetX(float vinkel) {
-		double radianer = (vinkel * Math.PI) / 180;
-		double enhedsCirkelX = Math.cos(radianer);
-		faktiskX = Math.round(enhedsCirkelX * getRadiusPaaKredsloeb() / 2);
+	
+	public void getPlanetX(double d) {
+		double radianer = (d * Math.PI) / 180;
+	    eX = Math.cos(radianer);
+//		faktiskX = Math.round(eX * getRadiusPaaKredsloeb() / 2);
+	    faktiskX = (long) (eX * getRadiusPaaKredsloeb() /2 );
 		faktiskX += centerX;
 	}
 
-	public void getPlanetY(float vinkel) {
-		double radianer = (vinkel * Math.PI) / 180;
-		double enhedsCirkelY = Math.sin(radianer);
+	public void getPlanetY(double d) {
+		double radianer = (d * Math.PI) / 180;
+		eY = Math.sin(radianer);
 
-		faktiskY = (int) (enhedsCirkelY * getRadiusPaaKredsloeb()) / 2;
+//		faktiskY = (int) (eY * getRadiusPaaKredsloeb()) / 2;
+		faktiskY = (long) (eY * getRadiusPaaKredsloeb() / 2);
 		faktiskY += centerY;
 	}
 
-	static private final long calcCircleCenter(long javaCoord, int radius) {
-		return (javaCoord - (radius / 2));
+	static private final double calcCircleCenter(long javaCoord, double radius2) {
+		return (javaCoord - (radius2 / 2));
 	}
 
 	public int getCircleCenterX() {
@@ -150,7 +155,7 @@ public class Planet {
 
 	public double beregnAfstandTilbagelagtIalt(double click) {
 		// afstand tilbagelagt i kredsløbet i alt
-		double retVal = click * this.planetensHastinghed;
+		double retVal = click * this.planetensHastighed;
 		return retVal;
 	}
 
@@ -173,8 +178,8 @@ public class Planet {
 	}
 
 	public void calcPlanet(EclipseTime ec) {
-		getPlanetX((vinkelFraCenterTilPlanet) - (radius / 2));
-		getPlanetY((vinkelFraCenterTilPlanet) - (radius / 2));
+		getPlanetX((vinkelFraCenterTilPlanet));
+		getPlanetY((vinkelFraCenterTilPlanet));
 		beregnPlanetensGradIKredsløbet(ec.getSSClick());
 		calcOrbit();
 	}
@@ -198,10 +203,10 @@ public class Planet {
 			g.drawArc(orbitRealX, orbitRealY, (int) radiusTilKredsloebCenter, (int) radiusTilKredsloebCenter, 0, 360);
 
 		// Tegn selve planeten PÅ kredsløbstregen
-		g.fillArc(getCircleCenterX(), getCircleCenterY(), radius, radius, 0, 360);
+		g.fillArc(getCircleCenterX(), getCircleCenterY(), (int)radius, (int)radius, 0, 360);
 
 		if (isDrawName()) {
-			g.drawString(this.name, faktiskX + radius, faktiskY + radius);
+			g.drawString(this.name, (int)(faktiskX + radius), (int)(faktiskY + radius));
 		}
 		// Pilen ud til kredsløbsstregen
 		if (isDrawRayToPlanet()) {
@@ -230,11 +235,11 @@ public class Planet {
 			moon.name = "Moon" + i;
 			moon.centerX = this.centerX;
 			moon.centerY = this.centerY;
-			moon.planetensHastinghed = Util.randInt(0, (int) this.planetensHastinghed * 5);
+			moon.planetensHastighed = Util.randInt(0, (int) this.planetensHastighed * 5);
 			moon.planetensTilbagelagteAfstand = 0;
 			moon.planetensTilbagelagteAfstandFraStart = Util.randInt(0, (int) this.getOmkredsPaaKredsloebet());
 			moon.setRadiusPaaKredsloeb(
-					this.getRadius() + this.getRadius() / 10 + Util.randInt(1, this.getRadius() / 3));
+					this.getRadius() + this.getRadius() / 10 + Util.randInt(1, (int) (this.getRadius() / 3)));
 			moon.setRadius(5);
 			moon.color = (new Color(Util.randInt(200, 255), Util.randInt(30, 100), Util.randInt(30, 90)));
 			moon.setDrawRayToPlanet(false);

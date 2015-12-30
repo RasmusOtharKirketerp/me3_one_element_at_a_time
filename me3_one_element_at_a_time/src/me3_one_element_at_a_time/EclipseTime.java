@@ -62,7 +62,7 @@ public class EclipseTime {
 		
 		for (int i = 0; i < arr.size(); i++) {
 			Planet x = arr.get(i);
-			g.drawString(x.name + " vinkel : "+ x.vinkelFraCenterTilPlanet, indryk, linje * (i+14));		
+			g.drawString(x.name + " vinkel : "+ (int)x.vinkelFraCenterTilPlanet + " E(x,y) :" + Math.round(x.eX * 100) + "," + Math.round(x.eY * 100), indryk, linje * (i+14));		
 		}
         
 	}
