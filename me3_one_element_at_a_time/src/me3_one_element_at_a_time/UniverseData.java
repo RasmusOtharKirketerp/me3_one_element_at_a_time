@@ -18,7 +18,8 @@ public final class UniverseData {
    
    ArrayList<Planet> allPlanetsToSun = new ArrayList<Planet>();
    
-   
+// path to images
+   static final String IMAGEPATH = "C:\\Users\\Rasmus\\git\\me3_one_element_at_a_time\\me3_one_element_at_a_time\\src\\me3_one_element_at_a_time\\";
    
 	public UniverseData(boolean debug) {
 		// TODO Auto-generated constructor stub
@@ -44,6 +45,7 @@ public final class UniverseData {
 			// start alle planet i o afstand
 			allPlanetsToSun.get(nyPlanetCounter).planetensTilbagelagteAfstandFraStart = 0;
 			allPlanetsToSun.get(nyPlanetCounter).setDrawRayToPlanet(false);
+			allPlanetsToSun.get(nyPlanetCounter).setImage();
 
 		}
 		

@@ -1,19 +1,25 @@
 //
 // http://www.windows2universe.org/our_solar_system/planets_table.html
 // http://www.fourmilab.ch/cgi-bin/Solar
+// http://planets.findthedata.com/ 
 //
 package me3_one_element_at_a_time;
 
 import java.awt.Color;
 import java.awt.Graphics2D;
+import java.awt.image.BufferedImage;
+import java.io.File;
+import java.io.IOException;
 import java.util.ArrayList;
+
+import javax.imageio.ImageIO;
 
 // En planet indeholde selv sit eget kredsøb
 public class Planet {
 	double radiusTilKredsloebCenter = 0;
 	// planetIndex = plads/nummer fra centrum eks = Jorden = 3;
 	private int planetIndex = 0;
-	private double radius = 0;
+	private double radius = 1;
 
 	// orbit real x,y
 	int orbitRealX, orbitRealY = 0;
@@ -41,6 +47,23 @@ public class Planet {
 	public boolean drawOrbit = true;
 	public boolean drawMoons = false;
 
+	
+	BufferedImage planetImage = null;
+	
+	public void setImage(){
+		try {
+			 planetImage = ImageIO.read(new File(UniverseData.IMAGEPATH + this.name + ".png"));
+		} catch (IOException e) {
+			try {
+				planetImage = ImageIO.read(new File(UniverseData.IMAGEPATH + "Default.png"));
+			} catch (IOException e1) {
+				// TODO Auto-generated catch block
+				e1.printStackTrace();
+			}
+		}
+		
+	}
+	
 	public boolean isDrawMoons() {
 		return drawMoons;
 	}
@@ -55,10 +78,10 @@ public class Planet {
 	}
 
 	public void setRadius(double planetsize) {
-		if (planetsize > 4)
+		if (planetsize > 10)
 			this.radius = planetsize;
 		else
-			this.radius = 5;
+			this.radius = 10;
 	}
 
 	public int getPlanetIndex() {
@@ -203,10 +226,10 @@ public class Planet {
 			g.drawArc(orbitRealX, orbitRealY, (int) radiusTilKredsloebCenter, (int) radiusTilKredsloebCenter, 0, 360);
 
 		// Tegn selve planeten PÅ kredsløbstregen
-		g.fillArc(getCircleCenterX(), getCircleCenterY(), (int)radius, (int)radius, 0, 360);
-
+		//g.fillArc(getCircleCenterX(), getCircleCenterY(), (int)radius, (int)radius, 0, 360);
+         g.drawImage(planetImage, getCircleCenterX(), getCircleCenterY(), (int)radius, (int)radius, null);
 		if (isDrawName()) {
-			g.drawString(this.name, (int)(faktiskX + radius), (int)(faktiskY + radius));
+			g.drawString(this.name, (int)(faktiskX) - 20, (int)(faktiskY - (radius /2) - 10 ));
 		}
 		// Pilen ud til kredsløbsstregen
 		if (isDrawRayToPlanet()) {
@@ -238,8 +261,8 @@ public class Planet {
 			moon.planetensHastighed = Util.randInt(0, (int) this.planetensHastighed * 5);
 			moon.planetensTilbagelagteAfstand = 0;
 			moon.planetensTilbagelagteAfstandFraStart = Util.randInt(0, (int) this.getOmkredsPaaKredsloebet());
-			moon.setRadiusPaaKredsloeb(
-					this.getRadius() + this.getRadius() / 10 + Util.randInt(1, (int) (this.getRadius() / 3)));
+//			moon.setRadiusPaaKredsloeb(
+//					this.getRadius() + this.getRadius() / 10 + Util.randInt(1, (int) (this.getRadius() / 3)));
 			moon.setRadius(5);
 			moon.color = (new Color(Util.randInt(200, 255), Util.randInt(30, 100), Util.randInt(30, 90)));
 			moon.setDrawRayToPlanet(false);

@@ -9,13 +9,19 @@ import java.awt.event.KeyEvent;
 import java.awt.event.KeyListener;
 import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
+import java.awt.image.BufferedImage;
+import java.io.File;
+import java.io.IOException;
 
+import javax.imageio.ImageIO;
 import javax.swing.JFrame;
+
 import javax.swing.JPanel;
 
 public class Main extends JPanel {
+
 	private static final long serialVersionUID = 1L;
-	static LokalKoordinatsystem aScreen = new LokalKoordinatsystem(GetScreenWorkingWidth(), GetScreenWorkingHeight());
+	static LokalKoordinatsystem aScreen = new LokalKoordinatsystem(GetScreenWorkingWidth()-400, GetScreenWorkingHeight());
 	static EclipseTime ec = new EclipseTime();
 	static int analyse = 2;
 	static boolean use_real_values = true;
@@ -42,9 +48,11 @@ public class Main extends JPanel {
 		g2d.setColor(Color.yellow);
 		// g2d.drawLine(0, 0, aScreen.relX(0), aScreen.relY(0));
 	}
+	
 
 	public void paint(Graphics g) {
 		super.paint(g);
+		
 		Graphics2D g2d = (Graphics2D) g;
 		g2d.setRenderingHint(RenderingHints.KEY_ANTIALIASING, RenderingHints.VALUE_ANTIALIAS_ON);
 		this.setBackground(Color.black);
@@ -216,10 +224,10 @@ public class Main extends JPanel {
 	static public MouseAdapter ma = new MouseAdapter() {
 		public void mouseClicked(MouseEvent evt) {
 			if ((evt.getModifiers() & InputEvent.BUTTON1_MASK) != 0) {
-				zoom(1.05);
+				zoom(1.10);
 			}
 			if ((evt.getModifiers() & InputEvent.BUTTON3_MASK) != 0) {
-				zoom(0.95);
+				zoom(0.90);
 			}
 		}
 	};
@@ -227,11 +235,11 @@ public class Main extends JPanel {
 	public static void zoom(double d) {
 		for (Planet x : ud.allPlanetsToSun) {
 			x.setRadiusPaaKredsloeb(x.getRadiusPaaKredsloeb() * d);
-			x.setRadius((int) (x.getRadius() * d));
+			x.setRadius( (x.getRadius() * d));
 			x.planetensHastighed = x.planetensHastighed * d;
 			for (Planet m : x.moons) {
 				m.setRadiusPaaKredsloeb(m.getRadiusPaaKredsloeb() * d);
-				m.setRadius((int) (m.getRadius() * d));
+				m.setRadius( (m.getRadius() * d));
 				m.planetensHastighed = m.planetensHastighed * d;
 			}
 
@@ -261,12 +269,15 @@ public class Main extends JPanel {
 		Main universe = new Main();
 		initUniverse();
 
+		
 		frame.add(universe);
 		frame.addMouseListener(ma);
 		frame.addKeyListener(myKL);
-		frame.setSize(aScreen.maxX - 200, aScreen.maxY - 200);
+		frame.setSize(aScreen.maxX, aScreen.maxY);
 		frame.setVisible(true);
 		frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
+		zoom(3);
+		
 		while (true) {
 			universe.repaint();
 			Thread.sleep(5);
