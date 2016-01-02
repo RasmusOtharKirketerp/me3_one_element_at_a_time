@@ -1,15 +1,14 @@
 package me3_one_element_at_a_time;
 
 import java.awt.Color;
-import java.awt.Font;
 import java.awt.Graphics2D;
 import java.util.ArrayList;
 
 public class EclipseTime {
 	// default click = hour;
 	private double ss_click;
-    private double unitsPrClick        = 0.0001;
-    private double standardUnitPrClick = 0.0001;
+    private double unitsPrClick        = 0.001;
+    private double standardUnitPrClick = 0.001;
     int linje = 20;
     int indryk = 20;
     
@@ -47,10 +46,8 @@ public class EclipseTime {
 	
 	public void draw(Graphics2D g, ArrayList<Planet> arr) {
 		g.setColor(Color.white);
-		Font c = new Font("Courier", Font.PLAIN, 14);
-		g.setFont(c);
 		g.drawString("EclipseTime :", indryk, linje);
-		//g.drawString("Clicks : " + ss_click, indryk, linje * 2);
+		g.drawString("Clicks : " + ss_click, indryk, linje * 2);
 		g.drawString("Key (*)   = Init Unitverse", indryk, linje * 3);
 		g.drawString("Key (r)   = Rays To Moons on", indryk, linje * 4);
 		g.drawString("Key (R)   = Rays To Moons off", indryk, linje * 5);
@@ -62,12 +59,12 @@ public class EclipseTime {
 		g.drawString("Key (m/M) = Moons on/off", indryk, linje * 11);
 		g.drawString("Key (a)   = Analyse mode (0,1,2) ", indryk, linje * 12);
 		g.drawString("Key (d/D) = debug ", indryk, linje * 13);
-/*		
+		
 		for (int i = 0; i < arr.size(); i++) {
 			Planet x = arr.get(i);
-			g.drawString(x.name + " vinkel : "+ (int)x.vinkelFraCenterTilPlanet + " E(x,y) :" + Math.round(x.eX * 100) + "," + Math.round(x.eY * 100), indryk, linje * (i+14));		
+			g.drawString(x.name + " vinkel : "+ x.vinkelFraCenterTilPlanet, indryk, linje * (i+14));		
 		}
-  */      
+        
 	}
 
 }

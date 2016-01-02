@@ -14,22 +14,22 @@ import javax.swing.JFrame;
 import javax.swing.JPanel;
 
 public class Main extends JPanel {
-
 	private static final long serialVersionUID = 1L;
-	static LokalKoordinatsystem aScreen = new LokalKoordinatsystem(GetScreenWorkingWidth()-400, GetScreenWorkingHeight());
+	static LokalKoordinatsystem aScreen = new LokalKoordinatsystem(GetScreenWorkingWidth(), GetScreenWorkingHeight());
 	static EclipseTime ec = new EclipseTime();
-	static int analyse = 2;
+	static int analyse = 1;
 	static boolean use_real_values = true;
+	
 	static UniverseData ud = new UniverseData(false);
 	
 	public static int GetScreenWorkingWidth() {
 		return java.awt.GraphicsEnvironment.getLocalGraphicsEnvironment().getMaximumWindowBounds().width;
 	}
 
-	public static int GetScreenWorkingHeight() {		
+	public static int GetScreenWorkingHeight() {
 		return java.awt.GraphicsEnvironment.getLocalGraphicsEnvironment().getMaximumWindowBounds().height;
 	}
-	
+
 	public Main() {
 	}
 
@@ -42,18 +42,31 @@ public class Main extends JPanel {
 		g2d.setColor(Color.yellow);
 		// g2d.drawLine(0, 0, aScreen.relX(0), aScreen.relY(0));
 	}
-	
 
 	public void paint(Graphics g) {
 		super.paint(g);
-		
 		Graphics2D g2d = (Graphics2D) g;
 		g2d.setRenderingHint(RenderingHints.KEY_ANTIALIASING, RenderingHints.VALUE_ANTIALIAS_ON);
 		this.setBackground(Color.black);
 		for (Planet planet : ud.allPlanetsToSun) {
 	        g.setColor(planet.color);
 	        planet.calcPlanet(ec);
-			planet.draw(g2d, ec, analyse, ud.allPlanetsToSun);
+			planet.drawPlanet(g2d, ec);
+			if (planet.getPlanetIndex() > 0) {
+				for (Planet drawToplanet : ud.allPlanetsToSun) {
+					if (analyse == 1) {
+						if (planet.getPlanetIndex() > drawToplanet.getPlanetIndex() + 1)
+							g.drawLine((int) planet.faktiskX, (int) planet.faktiskY, (int) drawToplanet.faktiskX,
+									(int) drawToplanet.faktiskY);
+					}
+					if (analyse == 2) {
+						if (planet.getPlanetIndex() == drawToplanet.getPlanetIndex() + 1)
+							g.drawLine((int) planet.faktiskX, (int) planet.faktiskY, (int) drawToplanet.faktiskX,
+									(int) drawToplanet.faktiskY);
+
+					}
+				}
+			}
 
 		}
 		ec.draw(g2d, ud.allPlanetsToSun);
@@ -62,7 +75,8 @@ public class Main extends JPanel {
 
 
 	static public void initUniverse() {
-	
+//		ud.allPlanetsToSun.clear();
+		
 		for (int nyPlanetCounter = 0; nyPlanetCounter < UniverseData.MAX_PLANETS; nyPlanetCounter++) {
 			ud.allPlanetsToSun.get(nyPlanetCounter).centerX = aScreen.relX(0);
 			ud.allPlanetsToSun.get(nyPlanetCounter).centerY = aScreen.relY(0);
@@ -202,10 +216,10 @@ public class Main extends JPanel {
 	static public MouseAdapter ma = new MouseAdapter() {
 		public void mouseClicked(MouseEvent evt) {
 			if ((evt.getModifiers() & InputEvent.BUTTON1_MASK) != 0) {
-				zoom(1.10);
+				zoom(1.05);
 			}
 			if ((evt.getModifiers() & InputEvent.BUTTON3_MASK) != 0) {
-				zoom(0.90);
+				zoom(0.95);
 			}
 		}
 	};
@@ -213,12 +227,12 @@ public class Main extends JPanel {
 	public static void zoom(double d) {
 		for (Planet x : ud.allPlanetsToSun) {
 			x.setRadiusPaaKredsloeb(x.getRadiusPaaKredsloeb() * d);
-			x.setRadius( (x.getRadius() * d));
-			x.planetensHastighed = x.planetensHastighed * d;
+			x.setRadius((int) (x.getRadius() * d));
+			x.planetensHastinghed = x.planetensHastinghed * d;
 			for (Planet m : x.moons) {
 				m.setRadiusPaaKredsloeb(m.getRadiusPaaKredsloeb() * d);
-				m.setRadius( (m.getRadius() * d));
-				m.planetensHastighed = m.planetensHastighed * d;
+				m.setRadius((int) (m.getRadius() * d));
+				m.planetensHastinghed = m.planetensHastinghed * d;
 			}
 
 		}
@@ -226,13 +240,13 @@ public class Main extends JPanel {
 
 	public static void speed(double d) {
 		for (Planet x : ud.allPlanetsToSun) {
-			x.planetensHastighed *= d;
-			if (x.planetensHastighed <= 0)
-				x.planetensHastighed = 1;
+			x.planetensHastinghed *= d;
+			if (x.planetensHastinghed <= 0)
+				x.planetensHastinghed = 1;
 			for (Planet m : x.moons) {
-				m.planetensHastighed = m.planetensHastighed * d;
-				if (m.planetensHastighed <= 0)
-					m.planetensHastighed = 1;
+				m.planetensHastinghed = m.planetensHastinghed * d;
+				if (m.planetensHastinghed <= 0)
+					m.planetensHastinghed = 1;
 
 			}
 
@@ -247,18 +261,15 @@ public class Main extends JPanel {
 		Main universe = new Main();
 		initUniverse();
 
-		
 		frame.add(universe);
 		frame.addMouseListener(ma);
 		frame.addKeyListener(myKL);
-		frame.setSize(aScreen.maxX, aScreen.maxY);
+		frame.setSize(aScreen.maxX - 200, aScreen.maxY - 200);
 		frame.setVisible(true);
 		frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
-		zoom(6);
-		
 		while (true) {
 			universe.repaint();
-			Thread.sleep(1);
+			Thread.sleep(5);
 			ec.click();
 		}
 
