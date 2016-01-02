@@ -9,13 +9,8 @@ import java.awt.event.KeyEvent;
 import java.awt.event.KeyListener;
 import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
-import java.awt.image.BufferedImage;
-import java.io.File;
-import java.io.IOException;
 
-import javax.imageio.ImageIO;
 import javax.swing.JFrame;
-
 import javax.swing.JPanel;
 
 public class Main extends JPanel {
@@ -25,17 +20,16 @@ public class Main extends JPanel {
 	static EclipseTime ec = new EclipseTime();
 	static int analyse = 2;
 	static boolean use_real_values = true;
-	
 	static UniverseData ud = new UniverseData(false);
 	
 	public static int GetScreenWorkingWidth() {
 		return java.awt.GraphicsEnvironment.getLocalGraphicsEnvironment().getMaximumWindowBounds().width;
 	}
 
-	public static int GetScreenWorkingHeight() {
+	public static int GetScreenWorkingHeight() {		
 		return java.awt.GraphicsEnvironment.getLocalGraphicsEnvironment().getMaximumWindowBounds().height;
 	}
-
+	
 	public Main() {
 	}
 
@@ -59,22 +53,7 @@ public class Main extends JPanel {
 		for (Planet planet : ud.allPlanetsToSun) {
 	        g.setColor(planet.color);
 	        planet.calcPlanet(ec);
-			planet.drawPlanet(g2d, ec);
-			if (planet.getPlanetIndex() > 0) {
-				for (Planet drawToplanet : ud.allPlanetsToSun) {
-					if (analyse == 1) {
-						if (planet.getPlanetIndex() > drawToplanet.getPlanetIndex() + 1)
-							g.drawLine((int) planet.faktiskX, (int) planet.faktiskY, (int) drawToplanet.faktiskX,
-									(int) drawToplanet.faktiskY);
-					}
-					if (analyse == 2) {
-						if (planet.getPlanetIndex() == drawToplanet.getPlanetIndex() + 1)
-							g.drawLine((int) planet.faktiskX, (int) planet.faktiskY, (int) drawToplanet.faktiskX,
-									(int) drawToplanet.faktiskY);
-
-					}
-				}
-			}
+			planet.draw(g2d, ec, analyse, ud.allPlanetsToSun);
 
 		}
 		ec.draw(g2d, ud.allPlanetsToSun);
@@ -83,8 +62,7 @@ public class Main extends JPanel {
 
 
 	static public void initUniverse() {
-//		ud.allPlanetsToSun.clear();
-		
+	
 		for (int nyPlanetCounter = 0; nyPlanetCounter < UniverseData.MAX_PLANETS; nyPlanetCounter++) {
 			ud.allPlanetsToSun.get(nyPlanetCounter).centerX = aScreen.relX(0);
 			ud.allPlanetsToSun.get(nyPlanetCounter).centerY = aScreen.relY(0);
@@ -276,11 +254,11 @@ public class Main extends JPanel {
 		frame.setSize(aScreen.maxX, aScreen.maxY);
 		frame.setVisible(true);
 		frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
-		zoom(3);
+		zoom(6);
 		
 		while (true) {
 			universe.repaint();
-			Thread.sleep(5);
+			Thread.sleep(1);
 			ec.click();
 		}
 

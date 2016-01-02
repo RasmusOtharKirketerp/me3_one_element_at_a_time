@@ -7,6 +7,7 @@ package me3_one_element_at_a_time;
 
 import java.awt.Color;
 import java.awt.Graphics2D;
+import java.awt.Point;
 import java.awt.image.BufferedImage;
 import java.io.File;
 import java.io.IOException;
@@ -19,6 +20,13 @@ public class Planet {
 	double radiusTilKredsloebCenter = 0;
 	// planetIndex = plads/nummer fra centrum eks = Jorden = 3;
 	private int planetIndex = 0;
+
+	// planet level er en marings for hvilket niveau planet er på
+	// level 0 = solen
+	// level 1 planeter = Jorden, mars Jupiter osv....
+	// level 2 er måner til level 1
+	// level 3 er måner til level 2....
+	int planetLevel = 0;
 	private double radius = 1;
 
 	// orbit real x,y
@@ -30,10 +38,13 @@ public class Planet {
 	// center X,Y er relativt
 	long centerX = 0;
 	long centerY = 0;
-	
-	//enheds Cirkel x,y
+
+	// enheds Cirkel x,y
 	double eX, eY = 0;
 	float vinkelFraCenterTilPlanet = 0;
+	// VinklerTilAndrePlaneter bruges til at analyser om planter ligger på samme
+	// linje
+	long[] vinklerTilAndrePlanet = new long[10];
 
 	String name;
 	private double omkreds;
@@ -47,12 +58,11 @@ public class Planet {
 	public boolean drawOrbit = true;
 	public boolean drawMoons = false;
 
-	
 	BufferedImage planetImage = null;
-	
-	public void setImage(){
+
+	public void setImage() {
 		try {
-			 planetImage = ImageIO.read(new File(UniverseData.IMAGEPATH + this.name + ".png"));
+			planetImage = ImageIO.read(new File(UniverseData.IMAGEPATH + this.name + ".png"));
 		} catch (IOException e) {
 			try {
 				planetImage = ImageIO.read(new File(UniverseData.IMAGEPATH + "Default.png"));
@@ -61,9 +71,9 @@ public class Planet {
 				e1.printStackTrace();
 			}
 		}
-		
+
 	}
-	
+
 	public boolean isDrawMoons() {
 		return drawMoons;
 	}
@@ -78,10 +88,7 @@ public class Planet {
 	}
 
 	public void setRadius(double planetsize) {
-		if (planetsize > 10)
-			this.radius = planetsize;
-		else
-			this.radius = 10;
+		this.radius = planetsize;
 	}
 
 	public int getPlanetIndex() {
@@ -141,12 +148,12 @@ public class Planet {
 		this.radiusTilKredsloebCenter = d;
 		this.omkreds = (int) Math.PI * this.radiusTilKredsloebCenter * 2;
 	}
-	
+
 	public void getPlanetX(double d) {
 		double radianer = (d * Math.PI) / 180;
-	    eX = Math.cos(radianer);
-//		faktiskX = Math.round(eX * getRadiusPaaKredsloeb() / 2);
-	    faktiskX = (long) (eX * getRadiusPaaKredsloeb() /2 );
+		eX = Math.cos(radianer);
+		// faktiskX = Math.round(eX * getRadiusPaaKredsloeb() / 2);
+		faktiskX = (long) (eX * getRadiusPaaKredsloeb() / 2);
 		faktiskX += centerX;
 	}
 
@@ -154,7 +161,7 @@ public class Planet {
 		double radianer = (d * Math.PI) / 180;
 		eY = Math.sin(radianer);
 
-//		faktiskY = (int) (eY * getRadiusPaaKredsloeb()) / 2;
+		// faktiskY = (int) (eY * getRadiusPaaKredsloeb()) / 2;
 		faktiskY = (long) (eY * getRadiusPaaKredsloeb() / 2);
 		faktiskY += centerY;
 	}
@@ -200,6 +207,15 @@ public class Planet {
 
 	}
 
+	public static double calcRotationAngleInDegrees(Point centerPt, Point targetPt) {
+		double theta = Math.atan2(targetPt.y - centerPt.y, targetPt.x - centerPt.x);
+		double angle = Math.toDegrees(theta);
+		if (angle < 0)
+			angle += 360;
+		angle *= -1;
+		return angle;
+	}
+
 	public void calcPlanet(EclipseTime ec) {
 		getPlanetX((vinkelFraCenterTilPlanet));
 		getPlanetY((vinkelFraCenterTilPlanet));
@@ -207,46 +223,94 @@ public class Planet {
 		calcOrbit();
 	}
 
-	// DRAW Funktion
+	// DRAW Funktion - Kan tegne alle elementer
 	// ---------------------------------------------------------------------------------------
-	public void drawPlanet(Graphics2D g, EclipseTime ec) {
-		g.setColor(this.color);
-		draw(g, 0, 360, "PLANET", ec);
-	}
-
-	public void draw(Graphics2D g, int startVinkel, int antalGrader, String type, EclipseTime ec) {
-		drawOrbit(g);
-		drawMoons(g, ec);
-	}
-	
-	
-	public void drawOrbit(Graphics2D g) {
-		// Selve kredløbs ringen
+	public void draw(Graphics2D g, EclipseTime ec, int analyse, ArrayList<Planet> allPlanets) {
+		// Kontrol af hvad der skal tegnes
+		drawPlanet(g);
+		if (isDrawName())
+			drawPlanetName(g);
 		if (isDrawOrbit())
-			g.drawArc(orbitRealX, orbitRealY, (int) radiusTilKredsloebCenter, (int) radiusTilKredsloebCenter, 0, 360);
+			drawOrbit(g);
+		if (this.isDrawMoons())
+			drawMoons(g, ec, analyse, allPlanets);
+		if (isDrawRayToPlanet())
+			drawRayToPlanet(g);
 
-		// Tegn selve planeten PÅ kredsløbstregen
-		//g.fillArc(getCircleCenterX(), getCircleCenterY(), (int)radius, (int)radius, 0, 360);
-         g.drawImage(planetImage, getCircleCenterX(), getCircleCenterY(), (int)radius, (int)radius, null);
-		if (isDrawName()) {
-			g.drawString(this.name, (int)(faktiskX) - 20, (int)(faktiskY - (radius /2) - 10 ));
+		if (planetIndex > -1) {
+			calcVinkelTilAndrePlaneter(allPlanets);
+			drawAnalyseRays(g, analyse, allPlanets);
 		}
-		// Pilen ud til kredsløbsstregen
-		if (isDrawRayToPlanet()) {
-			g.drawLine((int) this.centerX, (int) this.centerY, (int) faktiskX, (int) faktiskY);
+	}
+
+	public void drawPlanetName(Graphics2D g) {
+		g.drawString(this.name, (int) (faktiskX) - 20, (int) (faktiskY - (radius / 2) - 10));
+	}
+
+	public void drawPlanet(Graphics2D g) {
+		g.drawImage(planetImage, getCircleCenterX(), getCircleCenterY(), (int) radius, (int) radius, null);
+	}
+
+	public void drawRayToPlanet(Graphics2D g) {
+		g.drawLine((int) this.centerX, (int) this.centerY, (int) faktiskX, (int) faktiskY);
+	}
+
+	public void drawOrbit(Graphics2D g) {
+		g.drawArc(orbitRealX, orbitRealY, (int) radiusTilKredsloebCenter, (int) radiusTilKredsloebCenter, 0, 360);
+	}
+
+	public void drawMoons(Graphics2D g, EclipseTime ec, int analyse, ArrayList<Planet> allPlanets) {
+		for (Planet moons : moons) {
+			moons.centerX = this.faktiskX;
+			moons.centerY = this.faktiskY;
+			moons.calcOrbit();
+			moons.calcPlanet(ec);
+			moons.draw(g, ec, analyse, allPlanets);
+		}
+	}
+
+	public void calcVinkelTilAndrePlaneter(ArrayList<Planet> allPlanets) {
+
+		for (int i = 0; i < allPlanets.size(); i++) {
+			Planet planet = new Planet();
+			planet = allPlanets.get(i);
+			Point pointCenter = new Point();
+			Point pointTo = new Point();
+
+			pointCenter.x = (int) this.faktiskX;
+			pointCenter.y = (int) this.faktiskY;
+
+			pointTo.x = (int) planet.faktiskX;
+			pointTo.y = (int) planet.faktiskY;
+			vinklerTilAndrePlanet[i] = (long) calcRotationAngleInDegrees(pointCenter, pointTo);
+			// System.out.println(name + "(vinkel til " + planet.name+ ") : " +
+			// vinklerTilAndrePlanet[i]);
 		}
 
 	}
 
-
-	public void drawMoons(Graphics2D g, EclipseTime ec) {
-		if (this.isDrawMoons()) {
-			for (Planet moons : moons) {
-				moons.centerX = this.faktiskX;
-				moons.centerY = this.faktiskY;
-				moons.calcOrbit();
-				moons.calcPlanet(ec);
-				moons.drawPlanet(g, ec);
+	public void drawAnalyseRays(Graphics2D g, int analyse, ArrayList<Planet> allPlanets) {
+		int x, y = 0;
+		for (int i = 0; i < vinklerTilAndrePlanet.length - 1; i++) {
+			if (planetLevel == 1) {
+				g.setColor(color);
+				x = ((planetIndex / 1000) * 130) + 240;
+				y = 0;
+				g.drawString(name, x + 20, y + 20);
+				g.drawImage(planetImage, x + 20, y + 40, 40, 40, null);
+				g.setColor(allPlanets.get(i).color);
+				y = 10;
+				g.fillArc(x - 10, y, (int) (100), (int) (100), (int) vinklerTilAndrePlanet[i], 2);
+			}
+			if (planetLevel == 2) {
+				g.setColor(color);
+				x = ((planetIndex / 1000) * 130) + 240;
+				y = 100;
+				g.drawString(name, x + 20, y + 20);
+				g.drawImage(planetImage, x + 20, y + 40, 40, 40, null);
+				g.setColor(allPlanets.get(i).color);
+				y = y + 10;
+				g.fillArc(x - 10, y, (int) (100), (int) (100), (int) vinklerTilAndrePlanet[i], 2);
 			}
 		}
 
@@ -255,19 +319,22 @@ public class Planet {
 	public void moonGenerator(int GenMoon) {
 		for (int i = 0; i < GenMoon; i++) {
 			Planet moon = new Planet();
-			moon.name = "Moon" + i;
+			moon.name = this.name + "'s moon" + i;
 			moon.centerX = this.centerX;
 			moon.centerY = this.centerY;
+			moon.planetIndex = this.planetIndex + (i * 100);
+			moon.planetLevel = this.planetLevel + 1;
 			moon.planetensHastighed = Util.randInt(0, (int) this.planetensHastighed * 5);
 			moon.planetensTilbagelagteAfstand = 0;
 			moon.planetensTilbagelagteAfstandFraStart = Util.randInt(0, (int) this.getOmkredsPaaKredsloebet());
-//			moon.setRadiusPaaKredsloeb(
-//					this.getRadius() + this.getRadius() / 10 + Util.randInt(1, (int) (this.getRadius() / 3)));
-			moon.setRadius(5);
+			moon.setRadiusPaaKredsloeb(
+					this.getRadius() + this.getRadius() / 10 + Util.randInt(1, (int) (this.getRadius() / 3)));
+			moon.setRadius(this.radius / Util.randInt(30, 50));
 			moon.color = (new Color(Util.randInt(200, 255), Util.randInt(30, 100), Util.randInt(30, 90)));
 			moon.setDrawRayToPlanet(false);
 			moon.setDrawName(false);
 			moon.setDrawOrbit(false);
+			moon.setImage();
 			this.addMoon(moon);
 
 		}
